@@ -1,5 +1,5 @@
 import { content } from './content';
-import { SITE_URL, TELEGRAM_URL } from './config';
+import { INSTAGRAM_URL, SITE_URL, TELEGRAM_URL } from './config';
 import { courses, roadmapStages } from './site-data';
 
 // Schema.org as a single graph: the crawler sees an organization, its website,
@@ -21,7 +21,7 @@ const organization = {
   url: `${SITE_URL}/`,
   logo: absolute('/logo-mark.png'),
   description: content.footer.note,
-  sameAs: [TELEGRAM_URL],
+  sameAs: [TELEGRAM_URL, INSTAGRAM_URL],
   contactPoint: {
     '@type': 'ContactPoint',
     contactType: 'customer support',

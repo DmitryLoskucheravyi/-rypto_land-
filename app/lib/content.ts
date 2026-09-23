@@ -149,6 +149,7 @@ export const content = {
     social: {
       label: 'Find us on',
       channel: 'Telegram channel',
+      instagram: 'Instagram',
     },
     contactNote: 'Courses are sold exclusively through our official Telegram channel.',
     risk: 'Course materials are educational and are not personal investment advice. Trading on the crypto market carries a risk of losing the money you invest — make your own decisions and never use money you cannot afford to lose.',

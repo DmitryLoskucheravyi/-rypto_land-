@@ -10,3 +10,4 @@ export { SupportShield } from './support-shield';
 export { RefreshCycle } from './refresh-cycle';
 export { TogglePlus } from './toggle-plus';
 export { MaterialsStack } from './materials-stack';
+export { InstagramMark } from './instagram-mark';

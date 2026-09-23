@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  INSTAGRAM_URL,
   TELEGRAM_URL,
   buildPublicConfig,
   normalizeBasePath,
@@ -39,4 +40,8 @@ describe('base path', () => {
 
 it('every call to action points at the Telegram channel', () => {
   expect(TELEGRAM_URL).toMatch(/^https:\/\/t\.me\/\+/);
+});
+
+it('links the project Instagram without share-tracking parameters', () => {
+  expect(INSTAGRAM_URL).toBe('https://www.instagram.com/crypt0_spheere/');
 });

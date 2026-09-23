@@ -7,6 +7,9 @@
 /** Every call to action on the page leads here. */
 export const TELEGRAM_URL = 'https://t.me/+mTBMA3ObGEI3YmMy';
 
+export const INSTAGRAM_HANDLE = 'crypt0_spheere';
+export const INSTAGRAM_URL = `https://www.instagram.com/${INSTAGRAM_HANDLE}/`;
+
 export type PublicConfig = Readonly<{
   /** Public site address without a trailing slash (canonical, sitemap, og:image). */
   siteUrl: string;

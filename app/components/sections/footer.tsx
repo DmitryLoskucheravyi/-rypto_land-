@@ -1,6 +1,6 @@
 import { content } from '../../lib/content';
-import { TELEGRAM_URL, asset } from '../../lib/config';
-import { TelegramMark } from '../icons';
+import { INSTAGRAM_HANDLE, INSTAGRAM_URL, TELEGRAM_URL, asset } from '../../lib/config';
+import { InstagramMark, TelegramMark } from '../icons';
 
 const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
   <li>
@@ -88,6 +88,14 @@ export const Footer = () => (
             <li>
               <SocialLink href={TELEGRAM_URL} label={content.footer.social.channel}>
                 <TelegramMark size={18} />
+              </SocialLink>
+            </li>
+            <li>
+              <SocialLink
+                href={INSTAGRAM_URL}
+                label={`${content.footer.social.instagram} @${INSTAGRAM_HANDLE}`}
+              >
+                <InstagramMark size={18} />
               </SocialLink>
             </li>
           </ul>
