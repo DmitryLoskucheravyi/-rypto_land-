@@ -1,0 +1,313 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Palette — trading-terminal override, logged in
+       plans/2026-09-20-crypto-landing-redesign/overrides.md (supersedes the
+       original gold-accent lock from 2026-09-20-crypto-courses-landing). */
+    --bg: 240 8% 5%;
+    --surface: 252 11% 9%;
+    --ink: 40 26% 93%;
+    --ink-muted: 32 7% 63%;
+    --accent: 162 66% 52%;
+    --accent-soft: 162 50% 26%;
+    /* Bearish/secondary — used only inside chart visuals (hero backdrop,
+       market-chart readout), never as a general UI color. */
+    --bear: 3 75% 60%;
+
+    /* Card stack in "How it works": where the first card parks and how much of
+       each parked card peeks out. The step is smaller on phones, otherwise the
+       third card slides below the bottom edge of a short screen. */
+    --stack-top: 72px;
+    --stack-peek: 54px;
+  }
+
+  @media (min-width: 768px) {
+    :root {
+      --stack-top: 88px;
+      --stack-peek: 84px;
+    }
+  }
+
+  body {
+    @apply bg-bg text-ink font-sans antialiased;
+  }
+
+  /* --- Native browser chrome, replaced with the project's own --- */
+
+  /* Scrollbar. Firefox gets the two-colour form, WebKit the full one. */
+  html {
+    scrollbar-color: hsl(var(--ink) / 0.2) transparent;
+    scrollbar-width: thin;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* No section may cause horizontal scrolling: the bento track deliberately
+     overflows its container, and on phones this is what separates "cinematic"
+     from "the page can be dragged sideways".
+     clip, not hidden: hidden would turn html/body into a scroll container and
+     break position: sticky, which bento and "How it works" rely on. */
+  html {
+    overflow-x: clip;
+  }
+
+  /* On phones paragraphs wrap by words instead of stretching the container
+     with long wallet addresses and the like. */
+  body {
+    overflow-wrap: break-word;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--bg));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--ink) / 0.18);
+    border: 3px solid hsl(var(--bg));
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--accent) / 0.55);
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: hsl(var(--bg));
+  }
+
+  /* Selection: the default is the OS blue, which is the one colour this
+     palette never uses. */
+  ::selection {
+    background: hsl(var(--accent) / 0.3);
+    color: hsl(var(--ink));
+  }
+
+  /* Focus. The ring is replaced, never removed: keyboard users still need to
+     see where they are, and :focus-visible keeps it off mouse clicks. */
+  :focus {
+    outline: none;
+  }
+
+  :focus-visible {
+    outline: 1px solid hsl(var(--accent));
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* The range thumb draws its own focus state, so the ring would double up. */
+  input[type='range']:focus-visible {
+    outline: none;
+  }
+
+  input[type='range']:focus-visible::-webkit-slider-thumb {
+    box-shadow:
+      0 0 0 4px hsl(var(--accent) / 0.25),
+      0 0 10px hsl(var(--accent) / 0.6);
+  }
+
+  input[type='range']:focus-visible::-moz-range-thumb {
+    box-shadow:
+      0 0 0 4px hsl(var(--accent) / 0.25),
+      0 0 10px hsl(var(--accent) / 0.6);
+  }
+
+  /* Heading ladder — the page steps down one rung per section instead of
+     falling off a cliff after the hero, and steps back up for the closing ask:
+       hero 4.25rem · bento 3rem · how-it-works 2.25rem · roadmap 2.125rem ·
+       market 2rem ·
+       courses 2rem (heavier weight, it is the commercial section) ·
+       faq 1.5rem · final CTA 2.25rem · footer body text.
+     Sizes live on the sections themselves; this is the map they follow. */
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    background: linear-gradient(180deg, hsl(var(--surface) / 0.97), hsl(var(--surface) / 0.92));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--ink) / 0.08);
+  }
+
+  .text-gradient-accent {
+    background: linear-gradient(120deg, hsl(var(--accent)), hsl(var(--ink)) 60%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .marquee-mask {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+  }
+
+  /* Horizontal carousel track: native scroll + snap, chrome hidden. */
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Graph-paper grid — the hero's full-bleed backdrop, reused behind the
+     market chart so the two chart moments share one surface. */
+  /* Film grain on the background, not over the page. z-index -1 puts it above
+     the body's fill but under every panel and every line of text, so it gives
+     the empty areas depth without speckling the content sitting on top. */
+  .grain-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: url('../public/grain.png');
+    background-repeat: repeat;
+    /* 512px tile drawn at 256 — finer speckle, and the tile is cross-faded at
+       its own edges so the repeat has no seam. The texture is white specks on
+       alpha, not a grey plate: on #0C0C0F a blend mode would have nothing to
+       work against, so the layer can only add light. */
+    background-size: 256px 256px;
+    opacity: 0.32;
+  }
+
+  /* Crosshair cursor. The `custom-cursor` class is added by the component
+     itself, so the native cursor is only hidden while the replacement is
+     actually mounted (never on touch, never with reduced motion). */
+  .custom-cursor,
+  .custom-cursor a,
+  .custom-cursor button {
+    cursor: none;
+  }
+
+  .cursor-crosshair-root {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 60;
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  .cursor-line {
+    position: absolute;
+    background: hsl(var(--ink) / 0.5);
+    transition: background-color 200ms ease;
+  }
+
+  .cursor-line-h {
+    left: -9px;
+    top: -0.5px;
+    width: 18px;
+    height: 1px;
+  }
+
+  .cursor-line-v {
+    top: -9px;
+    left: -0.5px;
+    height: 18px;
+    width: 1px;
+  }
+
+  .cursor-box {
+    position: absolute;
+    left: -9px;
+    top: -9px;
+    width: 18px;
+    height: 18px;
+    border: 1px solid hsl(var(--ink) / 0.25);
+    transition:
+      width 200ms ease,
+      height 200ms ease,
+      left 200ms ease,
+      top 200ms ease,
+      border-color 200ms ease;
+  }
+
+  .cursor-crosshair-root.is-target .cursor-box {
+    left: -14px;
+    top: -14px;
+    width: 28px;
+    height: 28px;
+    border-color: hsl(var(--accent));
+  }
+
+  .cursor-crosshair-root.is-target .cursor-line {
+    background: hsl(var(--accent));
+  }
+
+  /* Terminal slider: square thumb, accent track, no platform chrome. */
+  .calc-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 2px;
+    background: hsl(var(--ink) / 0.15);
+    outline: none;
+  }
+
+  .calc-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    background: hsl(var(--accent));
+    cursor: pointer;
+    box-shadow: 0 0 10px hsl(var(--accent) / 0.6);
+  }
+
+  .calc-range::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border: none;
+    border-radius: 0;
+    background: hsl(var(--accent));
+    cursor: pointer;
+    box-shadow: 0 0 10px hsl(var(--accent) / 0.6);
+  }
+
+  .chart-grid {
+    background-image:
+      repeating-linear-gradient(to right, hsl(var(--ink) / 0.06) 0 1px, transparent 1px 72px),
+      repeating-linear-gradient(to bottom, hsl(var(--ink) / 0.06) 0 1px, transparent 1px 42px);
+  }
+
+  /* Fades the ruled paper out at the edges so it reads as a backdrop rather
+     than a boxed-in panel. */
+  .chart-grid-fade {
+    -webkit-mask-image: radial-gradient(120% 100% at 50% 50%, #000 30%, transparent 78%);
+    mask-image: radial-gradient(120% 100% at 50% 50%, #000 30%, transparent 78%);
+  }
+
+  /* Oversized ghost numeral behind a card's header — scale without content. */
+  .step-watermark {
+    color: transparent;
+    -webkit-text-stroke: 1px hsl(var(--ink) / 0.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
