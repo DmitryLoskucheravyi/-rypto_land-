@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useId, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { content } from '../../lib/content';
 import { asset } from '../../lib/config';
 import { RoadmapStage } from '../../lib/site-data';
@@ -103,29 +103,28 @@ export const RoadmapCard = ({ stage }: { stage: RoadmapStage }) => {
             {content.roadmap.structureCta}
           </button>
 
-          <AnimatePresence initial={false}>
-            {open && (
-              <motion.div
-                id={panelId}
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: DURATION.standard, ease: EASE }}
-                className="overflow-hidden"
-              >
-                <ol className="mt-4 space-y-2 border-t border-ink/10 pt-4">
-                  {stage.modules.map((module, i) => (
-                    <li key={`${module}-${i}`} className="flex gap-3 text-sm text-ink-muted">
-                      <span className="font-mono text-xs tabular-nums text-accent/60">
-                        {String(i + 1).padStart(2, '0')}
-                      </span>
-                      <span>{module}</span>
-                    </li>
-                  ))}
-                </ol>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Always rendered, only collapsed: the module list is part of the
+              static HTML, so crawlers and text parsers read the full program
+              without having to press the button. */}
+          <motion.div
+            id={panelId}
+            initial={false}
+            animate={open ? { height: 'auto', opacity: 1 } : { height: 0, opacity: 0 }}
+            transition={{ duration: DURATION.standard, ease: EASE }}
+            aria-hidden={!open}
+            className="overflow-hidden"
+          >
+            <ol className="mt-4 space-y-2 border-t border-ink/10 pt-4">
+              {stage.modules.map((module, i) => (
+                <li key={`${module}-${i}`} className="flex gap-3 text-sm text-ink-muted">
+                  <span className="font-mono text-xs tabular-nums text-accent/60">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span>{module}</span>
+                </li>
+              ))}
+            </ol>
+          </motion.div>
         </motion.div>
       )}
     </motion.div>

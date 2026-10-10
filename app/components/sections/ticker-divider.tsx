@@ -2,14 +2,17 @@
 
 import { useReducedMotion } from 'framer-motion';
 import { ticker } from '../../lib/site-data';
+import { useMounted } from '../../lib/use-mounted';
 
 // Deliberately not a price tape: the items are course vocabulary, so nothing
 // here can be mistaken for a live quote.
 // Same seam trick as trust-strip: the set is rendered twice and the track
-// shifts by exactly -50%, so the loop point is invisible.
+// shifts by exactly -50%, so the loop point is invisible. The second set is
+// added after mount, so the static HTML lists each item once.
 export const TickerDivider = () => {
   const reduceMotion = useReducedMotion();
-  const items = [...ticker, ...ticker];
+  const mounted = useMounted();
+  const items = mounted ? [...ticker, ...ticker] : ticker;
 
   return (
     <div className="overflow-hidden border-y border-ink/10 py-3" aria-hidden="true">

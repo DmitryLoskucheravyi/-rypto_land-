@@ -14,6 +14,7 @@ import {
   CtaArrow,
 } from '../icons';
 import { fadeUp, DURATION, EASE } from '../../lib/motion';
+import { useMounted } from '../../lib/use-mounted';
 
 const ICONS = {
   materials: MaterialsStack,
@@ -30,9 +31,11 @@ const COUNT = CELLS.length;
 // scroll settles outside that copy it is shifted by exactly one block width,
 // which puts an identical card in an identical place — so the carousel runs
 // forever in both directions with nothing to see at the seam.
-const COPIES = 3;
+// The static HTML carries only the middle copy; the padding copies are added
+// after mount, when the track is moved onto the middle copy anyway.
 const ITEMS = [...CELLS, ...CELLS, ...CELLS];
 const HOME = COUNT;
+const STATIC_ITEMS = ITEMS.slice(HOME, HOME + COUNT);
 
 const IDLE_MS = 160;
 
@@ -50,6 +53,7 @@ const column = {
 
 export const Bento = () => {
   const reduceMotion = useReducedMotion();
+  const mounted = useMounted();
   const trackRef = useRef<HTMLDivElement>(null);
 
   // `active` is read from scrollLeft, so a manual swipe and an automatic
@@ -172,7 +176,7 @@ export const Bento = () => {
       window.clearTimeout(idle);
       if (frame) cancelAnimationFrame(frame);
     };
-  }, [measure, nearestIndex, recenter]);
+  }, [measure, nearestIndex, recenter, mounted]);
 
   useEffect(() => {
     const el = trackRef.current;
@@ -337,7 +341,10 @@ export const Bento = () => {
                 dragging ? 'cursor-grabbing select-none' : 'cursor-grab'
               }`}
             >
-              {ITEMS.map((cell, i) => {
+              {(mounted ? ITEMS : STATIC_ITEMS).map((cell, j) => {
+                // Absolute index into ITEMS either way, so the middle copy keeps
+                // its keys and DOM nodes when the padding copies arrive.
+                const i = mounted ? j : HOME + j;
                 const Icon = ICONS[cell.icon];
                 const isActive = i % COUNT === active;
                 const copy = Math.floor(i / COUNT);
@@ -357,7 +364,7 @@ export const Bento = () => {
                   >
                     <Image
                       src={asset(cell.image)}
-                      alt=""
+                      alt={copy === 1 ? cell.alt : ''}
                       fill
                       sizes="(max-width: 768px) 82vw, 420px"
                       className="object-cover"

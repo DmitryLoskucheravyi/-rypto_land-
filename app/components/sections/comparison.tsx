@@ -32,44 +32,60 @@ export const Comparison = () => {
           </h2>
         </motion.div>
 
-        <div className="mt-10 overflow-hidden rounded-2xl border border-ink/10 md:mt-12">
-          <div className="hidden grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1.2fr)] border-b border-ink/10 bg-surface/95 md:grid">
-            <span className="px-6 py-4 font-mono text-[11px] uppercase tracking-[0.16em] text-ink-muted" />
-            <span className="px-6 py-4 font-mono text-[11px] uppercase tracking-[0.16em] text-ink-muted">
-              {comparison.leftTitle}
-            </span>
-            <span className="px-6 py-4 font-mono text-[11px] uppercase tracking-[0.16em] text-accent">
-              {comparison.rightTitle}
-            </span>
-          </div>
+        {/* A real table, so the two columns stay attributable outside the
+            browser too; every part is re-displayed as block/grid to keep the
+            stacked mobile layout. */}
+        <table className="mt-10 block w-full overflow-hidden rounded-2xl border border-ink/10 md:mt-12">
+          <thead className="hidden md:block">
+            <tr className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1.2fr)] border-b border-ink/10 bg-surface/95">
+              <td className="block px-6 py-4" />
+              <th
+                scope="col"
+                className="block px-6 py-4 text-left font-mono text-[11px] font-normal uppercase tracking-[0.16em] text-ink-muted"
+              >
+                {comparison.leftTitle}
+              </th>
+              <th
+                scope="col"
+                className="block px-6 py-4 text-left font-mono text-[11px] font-normal uppercase tracking-[0.16em] text-accent"
+              >
+                {comparison.rightTitle}
+              </th>
+            </tr>
+          </thead>
 
-          {comparison.rows.map((row, i) => (
-            <motion.div
-              key={row.label}
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1], delay: i * 0.04 }}
-              className="grid grid-cols-1 gap-2 border-b border-ink/10 px-5 py-5 last:border-b-0 sm:px-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1.2fr)] md:items-baseline md:gap-0 md:px-0 md:py-0"
-            >
-              <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-muted md:px-6 md:py-5">
-                {row.label}
-              </span>
-              <span className="flex gap-2 font-mono text-sm text-ink-muted md:px-6 md:py-5">
-                <span aria-hidden="true" className="select-none opacity-50">
-                  -
-                </span>
-                {row.left}
-              </span>
-              <span className="flex gap-2 font-mono text-sm text-ink md:px-6 md:py-5">
-                <span aria-hidden="true" className="select-none text-accent">
-                  +
-                </span>
-                {row.right}
-              </span>
-            </motion.div>
-          ))}
-        </div>
+          <tbody className="block">
+            {comparison.rows.map((row, i) => (
+              <motion.tr
+                key={row.label}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1], delay: i * 0.04 }}
+                className="grid grid-cols-1 gap-2 border-b border-ink/10 px-5 py-5 last:border-b-0 sm:px-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_minmax(0,1.2fr)] md:items-baseline md:gap-0 md:px-0 md:py-0"
+              >
+                <th
+                  scope="row"
+                  className="block text-left font-mono text-[11px] font-normal uppercase tracking-[0.16em] text-ink-muted md:px-6 md:py-5"
+                >
+                  {row.label}
+                </th>
+                <td className="flex gap-2 font-mono text-sm text-ink-muted md:px-6 md:py-5">
+                  <span aria-hidden="true" className="select-none opacity-50">
+                    -
+                  </span>
+                  {row.left}
+                </td>
+                <td className="flex gap-2 font-mono text-sm text-ink md:px-6 md:py-5">
+                  <span aria-hidden="true" className="select-none text-accent">
+                    +
+                  </span>
+                  {row.right}
+                </td>
+              </motion.tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </section>
   );

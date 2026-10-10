@@ -13,11 +13,13 @@ type Props = {
 
 // Used exactly twice on the page (hero H1, final CTA H2) — it is a signature
 // moment, not a decoration for every heading.
-// The real text is always in the DOM for assistive tech; the animated layer is
-// aria-hidden, so the heading is announced once and correctly.
+// At rest the heading is plain text, so the static HTML holds it exactly once.
+// Only while the glyphs are cycling does the real text move to an sr-only copy
+// beside an aria-hidden animated layer, so it is still announced correctly.
 export const ScrambleText = ({ text, trigger = 'mount', duration = 280, className }: Props) => {
   const ref = useRef<HTMLSpanElement>(null);
   const [display, setDisplay] = useState(text);
+  const [running, setRunning] = useState(false);
 
   useEffect(() => {
     const node = ref.current;
@@ -28,6 +30,7 @@ export const ScrambleText = ({ text, trigger = 'mount', duration = 280, classNam
     let cancelled = false;
 
     const run = () => {
+      setRunning(true);
       const start = performance.now();
       const tick = (now: number) => {
         if (cancelled) return;
@@ -43,7 +46,10 @@ export const ScrambleText = ({ text, trigger = 'mount', duration = 280, classNam
             .join(''),
         );
         if (t < 1) frame = requestAnimationFrame(tick);
-        else setDisplay(text);
+        else {
+          setDisplay(text);
+          setRunning(false);
+        }
       };
       frame = requestAnimationFrame(tick);
     };
@@ -75,8 +81,14 @@ export const ScrambleText = ({ text, trigger = 'mount', duration = 280, classNam
 
   return (
     <span ref={ref} className={className}>
-      <span className="sr-only">{text}</span>
-      <span aria-hidden="true">{display}</span>
+      {running ? (
+        <>
+          <span className="sr-only">{text}</span>
+          <span aria-hidden="true">{display}</span>
+        </>
+      ) : (
+        text
+      )}
     </span>
   );
 };

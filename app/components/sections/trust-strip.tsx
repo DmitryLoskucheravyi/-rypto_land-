@@ -4,8 +4,23 @@ import Image from 'next/image';
 import { motion, useReducedMotion } from 'framer-motion';
 import { fadeUp } from '../../lib/motion';
 import { asset } from '../../lib/config';
+import { useMounted } from '../../lib/use-mounted';
 
-const ICONS = Array.from({ length: 11 }, (_, i) => asset(`/${i + 1}.png`));
+// Coin logos, in file order: /1.png … /11.png.
+const COINS = [
+  'Cosmos',
+  'USD Coin',
+  'Solana',
+  'Toncoin',
+  'Ethereum',
+  'TRON',
+  'Zcash',
+  'BNB',
+  'Tether',
+  'Avalanche',
+  'Bitcoin',
+];
+const ICONS = COINS.map((name, i) => ({ name, src: asset(`/${i + 1}.png`) }));
 
 // Circuit traces between icons: every path enters at (0,28) and leaves at
 // (96,28) — the icon centre line — so the thread stays connected however far it
@@ -61,6 +76,7 @@ const Electron = ({ d, charge }: { d: string; charge: Charge }) => (
 
 export const TrustStrip = () => {
   const reduceMotion = useReducedMotion();
+  const mounted = useMounted();
 
   return (
     <section className="border-y border-ink/10 overflow-hidden">
@@ -72,15 +88,18 @@ export const TrustStrip = () => {
         className="marquee-mask py-6 sm:py-8"
       >
         {/* Track holds the set twice and shifts by exactly -50%; icon + wire
-            blocks are all the same width, so the midpoint seam is invisible. */}
+            blocks are all the same width, so the midpoint seam is invisible.
+            The second set is added after mount and hidden from assistive tech,
+            so the static HTML names each coin once. */}
         <div className="flex w-max animate-marquee hover:[animation-play-state:paused]">
-          {[...ICONS, ...ICONS].map((src, i) => {
+          {(mounted ? [...ICONS, ...ICONS] : ICONS).map((icon, i) => {
             const wire = WIRES[i % WIRES.length];
+            const copy = i >= ICONS.length;
             return (
-              <div key={i} className="flex shrink-0 items-center">
+              <div key={i} aria-hidden={copy || undefined} className="flex shrink-0 items-center">
                 <Image
-                  src={src}
-                  alt=""
+                  src={icon.src}
+                  alt={copy ? '' : `${icon.name} logo`}
                   width={44}
                   height={44}
                   unoptimized
